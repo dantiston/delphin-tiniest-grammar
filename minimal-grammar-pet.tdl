@@ -1,0 +1,18 @@
+:begin :type.
+:include "head-types".
+:include "matrix".
+:include "minimal-grammar".
+:include "mtr".
+:end :type.
+
+:begin :instance :status lex-entry.
+:include "lexicon".
+:end :instance.
+
+:begin :instance :status rule.
+:include "rules".
+:end :instance.
+
+:begin :instance.
+:include "roots".
+:end :instance.
