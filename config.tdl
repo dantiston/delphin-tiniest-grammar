@@ -1,4 +1,4 @@
-grammar-top               := minimal-grammar-pet.tdl.
+grammar-top               := definition.tdl.
 preprocessor              := vanilla.rpp.
 quickcheck-code           := qc.tdl.
 
