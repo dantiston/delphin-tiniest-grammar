@@ -1,17 +1,60 @@
 sign-min := avm &
   [ STEM list ].
 
-basic-sign := sign-min &
-  [ KEY-ARG bool ].
+basic-sign := sign-min.
 
 sign := basic-sign &
   [ SYNSEM synsem,
     ARGS list ].
 
+sort := *top*.
+predsort := sort.
+atom := predsort.
+no-pred := predsort.
+norm_rel := predsort.
+named_rel := norm_rel.
+
+avm := *top*.
+
+list := avm.
+
+cons := list &
+  [ FIRST *top*,
+    REST list ].
+
+olist := list.
+ocons := olist & cons &
+  [ FIRST unexpressed,
+    REST  olist ].
+onull := olist & null.
+
+0-1-list := list.
+1-list := 0-1-list & cons &
+  [ REST null ].
+null := 0-1-list.
+1-plus-list := cons &
+  [ REST cons ].
+
+diff-list := avm &
+  [ LIST list,
+    LAST list ].
+0-1-dlist := diff-list &
+  [ LIST 0-1-list ].
+0-dlist := 0-1-dlist &
+  [ LIST #list,
+    LAST #list ].
+1-dlist := 0-1-dlist &
+  [ LIST 1-list &
+     [ REST #rest ],
+    LAST #rest ].
+
+integer := atom.
+string := atom.
+
 phrase-or-lexrule := sign &
-  [ SYNSEM canonical-synsem &
+  [ SYNSEM expressed-synsem &
        [ LOCAL.CONT.HOOK #hook],
-    C-CONT mrs-min & [ HOOK #hook] ].
+    C-CONT mrs & [ HOOK #hook] ].
 
 word-or-lexrule-min := sign-min.
 
@@ -20,18 +63,12 @@ word-or-lexrule := word-or-lexrule-min & sign &
     ARG-ST list ].
 
 alts-min := avm.
-alts := alts-min &
-  [ PASSIVE bool ].
+alts := alts-min.
 no-alts := alts-min.
-
-word := word-or-lexrule.
 
 lex-item := word-or-lexrule.
 
 phrase := phrase-or-lexrule.
-
-non-affix-bearing := word-or-lexrule &
-  [ SYNSEM.LKEYS.KEYREL.WLINK cons ].
 
 rule := sign &
   [ RULE-NAME string ].
@@ -46,69 +83,40 @@ meta := sign &
   [ META-PREFIX string,
     META-SUFFIX string ].
 
-synsem-min := avm &
-  [ OPT bool,
-    LOCAL mod-local ].
+synsem := avm &
+  [ LOCAL mod-local ].
 
-lex-or-phrase-synsem := synsem-min &
-  [ LIGHT luk ].
-
-synsem := synsem-min &
-  [ L-PERIPH luk,
-    R-PERIPH luk ].
+lex-or-phrase-synsem := synsem.
 
 expressed-synsem := synsem.
 
-canonical-synsem := expressed-synsem &
-  [ MODIFIED xmod ].
-
-lex-synsem := canonical-synsem & lex-or-phrase-synsem &
-  [ LOCAL local-min,
-    LIGHT +,
+lex-synsem := expressed-synsem & lex-or-phrase-synsem &
+  [ LOCAL local,
     LKEYS lexkeys ].
 
-phr-synsem-min := canonical-synsem & lex-or-phrase-synsem &
-  [ LOCAL local-min ].
-
-phr-synsem := phr-synsem-min &
-  [ LIGHT - ].
+phr-synsem := expressed-synsem & lex-or-phrase-synsem &
+  [ LOCAL local ].
 
 non-canonical := synsem &
   [ LOCAL.CONT.HOOK.INDEX event-or-ref-index ].
 
 expressed-non-canonical := non-canonical & expressed-synsem.
 
-gap := expressed-non-canonical &
-  [ LOCAL #local ].
-
-unexpressed := synsem-min.
+unexpressed := synsem.
 
 unexpressed-reg := unexpressed & non-canonical.
 
-
-anti-synsem := unexpressed.
-
 mod-local := avm.
 
-local-min := mod-local &
-  [ CAT cat-min,
-    CONT mrs-min,
-    AGR individual ].
+local := mod-local &
+  [ CAT cat,
+    CONT mrs,
+    AGR individual,
+    CTXT ctxt ].
 
-local := local-min &
-  [ CTXT ctxt-min ].
-
-scopal-mod := local.
-intersective-mod := local.
-
-cat-min := avm.
-
-cat := cat-min &
+cat := avm &
   [ HEAD head-min,
-    VAL valence-min,
-    MC luk,
-    HC-LIGHT luk,
-    POSTHEAD bool ].
+    VAL valence-min ].
 
 cat-sat := cat &
  [ VAL [ SPR olist,
@@ -121,19 +129,11 @@ head-min := avm.
 
 head := head-min &
   [ MOD list,
-    PRD bool,
     KEYS keys_min ].
 
-
-conj := +mo & +do & +co & +po & +ro & +jo & +vo & +no.
-num := +mo & +dm & +cm & +pm & +rm & +jm & +vm & +nm.
-det := +do & +dm & +cd & +pd & +rd & +jd & +vd & +nd.
-comp := +co & +cm & +cd & +pc & +rc & +jc & +vc & +nc.
-adp := +po & +pm & +pd & +pc & +rp & +jp & +vp & +np.
-adv := +ro & +rm & +rd & +rc & +rp & +jr & +vr & +nr.
-adj := +jo & +jm & +jd & +jc & +jp & +jr & +vj & +nj.
-verb := +vo & +vm & +vd & +vc & +vp & +vr & +vj & +nv.
-noun := +no & +nm & +nd & +nc & +np & +nr & +nj & +nv.
+verb-or-noun := head.
+verb := verb-or-noun.
+noun := verb-or-noun.
 
 valence-min := avm.
 
@@ -141,19 +141,14 @@ valence := valence-min &
   [ SUBJ list,
     SPR list,
     COMPS list,
-    SPEC list,
-    --KEYCOMP avm ].
+    SPEC list ].
 
 keys_min := avm.
 keys := keys_min &
   [ KEY predsort,
     ALTKEY predsort ].
 
-semsort := sort.
-
-mrs-min := avm.
-
-mrs := mrs-min &
+mrs := avm &
   [ HOOK hook,
     RELS diff-list,
     HCONS diff-list ].
@@ -173,59 +168,30 @@ nom-obj := mrs &
 
 lexkeys := avm &
   [ KEYREL relation,
-    ALTKEYREL relation,
-    --COMPKEY predsort,
-    --OCOMPKEY predsort ].
+    ALTKEYREL relation ].
 
-ctxt-min := avm.
-
-ctxt := ctxt-min &
-  [ ACTIVATED bool,
-    PRESUP diff-list ].
-
+ctxt := avm &
+  [ PRESUP diff-list ].
 
 qeq := avm &
   [ HARG handle,
     LARG handle ].
 
-
 semarg := avm &
   [ INSTLOC string ].
 
 handle := semarg.
-individual := semarg &
-  [ SORT semsort ].
+individual := semarg.
 
-index := individual &
-     [ SPECI bool ].
+index := individual.
 
 event-or-ref-index := individual.
 
 expl-ind := index.
 
-ref-ind := index & event-or-ref-index &
-    [ PNG png ].
-
-png := avm.
-
-tense := sort.
-aspect := sort.
-mood := sort.
-
-tam := avm &
-  [ TENSE tense,
-    ASPECT aspect,
-    MOOD mood ].
-
-iforce := avm.
-prop-or-ques := iforce.
-prop := prop-or-ques.
-ques := prop-or-ques.
-comm := iforce.
-
-event := event-or-ref-index &
-  [ E tam,
-    SF iforce ].
+ref-ind := index & event-or-ref-index.
+    
+event := event-or-ref-index.
 
 relation := avm &
   [ LBL handle,
@@ -261,84 +227,6 @@ quant-relation := arg0-relation &
     RSTR handle,
     BODY handle ].
 
-norm_rel := predsort.
-named_rel := norm_rel.
-
-luk := sort.
-
-na-or-+ := luk.
-na-or-- := luk.
-+-or-- := luk.
-
-na := na-or-+ & na-or--.
-bool := luk.
-+ := bool & na-or-+ & +-or--.
-- := bool & na-or-- & +-or--.
-
-xmod := sort &
-  [ PERIPH luk ].
-notmod-or-rmod := xmod.
-notmod-or-lmod := xmod.
-notmod := notmod-or-rmod & notmod-or-lmod.
-
-hasmod := xmod.
-lmod := hasmod & notmod-or-lmod.
-rmod := hasmod & notmod-or-rmod.
-
-sort := *top*.
-predsort := sort.
-atom := predsort.
-no-pred := predsort.
-avm := *top*.
-list := avm.
-
-cons := list &
-  [ FIRST *top*,
-    REST list ].
-
-0-1-list := list.
-1-list := 0-1-list & cons &
-  [ REST null ].
-null := 0-1-list.
-1-plus-list := cons &
-  [ REST cons ].
-
-diff-list := avm &
-  [ LIST list,
-    LAST list ].
-
-0-1-dlist := diff-list &
-  [ LIST 0-1-list ].
-0-dlist := 0-1-dlist &
-  [ LIST #list,
-    LAST #list ].
-
-1-dlist := 0-1-dlist &
-  [ LIST 1-list &
-     [ REST #rest ],
-    LAST #rest ].
-
-
-dl-append := avm & [APPARG1 [LIST #first,
-                             LAST #between],
-                    APPARG2 [LIST #between,
-                             LAST #last],
-                    RESULT  [LIST #first,
-                             LAST #last]].
-
-integer := atom.
-
-string := atom.
-
-olist := list.
-
-ocons := olist & cons &
-  [ FIRST unexpressed & [ OPT + ],
-    REST  olist ].
-
-onull := olist & null.
-
-
 headed-phrase := phrase &
   [ SYNSEM.LOCAL [ CAT.HEAD head & #head,
                    AGR #agr ],
@@ -361,24 +249,20 @@ head-valence-phrase := head-nexus-phrase.
 
 basic-unary-phrase := phrase &
   [ STEM #stem,
-    SYNSEM [ L-PERIPH #lperiph,
-         R-PERIPH #rperiph,
-         LOCAL [ CONT [ RELS [ LIST #first,
-                   LAST #last ],
+    SYNSEM [ LOCAL [ CONT [ RELS [ LIST #first,
+                                   LAST #last ],
                 HCONS [ LIST #scfirst,
-                    LAST #sclast ] ] ] ],
+                        LAST #sclast ] ] ] ],
     C-CONT [ RELS [ LIST #middle,
-            LAST #last ],
+                    LAST #last ],
          HCONS [ LIST #scmiddle,
-             LAST #sclast ] ],
-    ARGS < sign & [ STEM #stem,
-            SYNSEM [ L-PERIPH #lperiph,
-                 R-PERIPH #rperiph,
-                 LOCAL local &
-                  [ CONT [ RELS [ LIST #first,
-                          LAST #middle ],
+                 LAST #sclast ] ],
+    ARGS < [ STEM #stem,
+             SYNSEM [ LOCAL local &
+                        [ CONT [ RELS [ LIST #first,
+                                        LAST #middle ],
                        HCONS [ LIST #scfirst,
-                           LAST #scmiddle ] ] ] ] ] > ].
+                               LAST #scmiddle ] ] ] ] ] > ].
 
 unary-phrase := basic-unary-phrase.
 
@@ -409,49 +293,6 @@ basic-binary-headed-phrase := headed-phrase & basic-binary-phrase &
 
 binary-headed-phrase := basic-binary-headed-phrase & binary-phrase.
 
-basic-ternary-phrase := phrase &
-  [ SYNSEM.LOCAL.CONT [ RELS [ LIST #first,
-                               LAST #last ],
-            HCONS [ LIST #scfirst,
-                    LAST #sclast ] ],
-    C-CONT [ RELS [ LIST #middle3,
-                    LAST #last ],
-         HCONS [ LIST #scmiddle3,
-                 LAST #sclast ] ],
-    ARGS <
-        sign & [ SYNSEM.LOCAL local &
-                 [ CONT [ RELS [ LIST #first,
-                                 LAST #middle1 ],
-                      HCONS [ LIST #scfirst,
-                              LAST #scmiddle1 ] ] ] ],
-        sign & [ SYNSEM.LOCAL local &
-                 [ CONT [ RELS [ LIST #middle1,
-                                 LAST #middle2 ],
-                      HCONS [ LIST #scmiddle1,
-                              LAST #scmiddle2 ] ] ] ],
-        sign & [ SYNSEM.LOCAL local &
-                 [ CONT [ RELS [ LIST #middle2,
-                                 LAST #middle3 ],
-                      HCONS [ LIST #scmiddle2,
-                              LAST #scmiddle3 ] ] ] ]> ].
-
-ternary-phrase := basic-ternary-phrase.
-
-ternary-headed-phrase := headed-phrase & ternary-phrase.
-
-ternary-head-middle-phrase := ternary-headed-phrase &
-  [ SYNSEM.LOCAL.CAT.VAL #val,
-    HEAD-DTR #head &
-        [ SYNSEM.LOCAL.CAT.VAL #val ],
-    ARGS.REST.FIRST #head ].
-
-
-binary-rule-left-to-right := basic-binary-phrase &
-  [ ARGS < [ KEY-ARG + ] , [ KEY-ARG bool ] > ].
-
-binary-rule-right-to-left := basic-binary-phrase &
-  [ ARGS < [ KEY-ARG bool ], [ KEY-ARG + ] > ].
-
 head-only := unary-phrase & headed-phrase &
   [ HEAD-DTR #head,
     ARGS < #head > ].
@@ -480,30 +321,20 @@ basic-non-rel-clause := clause & head-compositional &
     C-CONT [ RELS <! !>,
              HCONS <! !> ] ].
 
-declarative-clause := basic-non-rel-clause &
-  [ SYNSEM.LOCAL.CONT.HOOK.INDEX.SF prop-or-ques ].
-
-imperative-clause := basic-non-rel-clause &
-  [ SYNSEM.LOCAL.CONT.HOOK.INDEX.SF comm ].
-
-
 basic-head-subj-phrase := head-valence-phrase & head-compositional &
               basic-binary-headed-phrase &
   [ SYNSEM phr-synsem &
-           [ LOCAL.CAT [ HC-LIGHT -,
-                         VAL [ SUBJ < >,
+           [ LOCAL.CAT [ VAL [ SUBJ < >,
                                COMPS #comps,
                                SPR #spr ] ] ],
     HEAD-DTR.SYNSEM.LOCAL.CAT.VAL [ SUBJ < #synsem >,
                                     COMPS #comps,
                                     SPR #spr ],
-    NON-HEAD-DTR.SYNSEM #synsem & canonical-synsem &
+    NON-HEAD-DTR.SYNSEM #synsem & expressed-synsem &
            [ LOCAL [ CAT [ VAL [ SUBJ olist,
                                  COMPS olist,
                                  SPR olist ] ] ] ],
     C-CONT [ RELS <! !>, HCONS <! !> ] ].
-
-decl-head-subj-phrase := basic-head-subj-phrase & declarative-clause.
 
 basic-bare-np-phrase := head-only & head-valence-phrase &
   [ SYNSEM.LOCAL.CAT.VAL [ SPR < >,
@@ -511,8 +342,7 @@ basic-bare-np-phrase := head-only & head-valence-phrase &
                            COMPS < > ],
     HEAD-DTR.SYNSEM.LOCAL [ CAT [ HEAD noun,
                                   VAL [ SPR < unexpressed &
-                                              [ LOCAL.CAT.HEAD +nd,
-                                                OPT + ] >,
+                                              [ LOCAL.CAT.HEAD noun ] >,
                                         SUBJ < >,
                                         COMPS < > ] ],
                             CONT.HOOK [ INDEX #index,
@@ -524,7 +354,6 @@ basic-bare-np-phrase := head-only & head-valence-phrase &
                       [ HARG #harg,
                         LARG #larg ] !>,
              HOOK [ INDEX #index ] ] ].
-
 
 norm-ltop-lex-item := lex-item &
   [ SYNSEM [ LOCAL.CONT [ HOOK [ LTOP #ltop ],
@@ -540,7 +369,6 @@ no-ltop-lex-item := lex-item &
                           HOOK.INDEX #index ],
              LKEYS.KEYREL #keyrel & [ ARG0 #index ] ] ].
 
-
 raise-index-mod-lex-item := norm-ltop-lex-item &
   [ SYNSEM.LOCAL [ CAT.HEAD.MOD < [ LOCAL.CONT.HOOK.INDEX #index ] >,
                    CONT.HOOK.INDEX #index ] ].
@@ -554,10 +382,10 @@ no-hcons-lex-item := lex-item &
 norm-sem-lex-item := norm-hook-lex-item & single-rel-lex-item.
 
 basic-one-arg := lex-item &
-  [ ARG-ST < synsem-min > ].
+  [ ARG-ST < synsem > ].
 
 basic-two-arg := lex-item &
-  [ ARG-ST < synsem-min, synsem-min > ].
+  [ ARG-ST < synsem, synsem > ].
 
 basic-two-arg-no-hcons := basic-two-arg & no-hcons-lex-item.
 
