@@ -1,0 +1,189 @@
+avm := *top*.
+
+list := avm.
+
+sign := avm &
+  [ STEM list,
+    SYNSEM synsem,
+    ARGS list ].
+
+phrase := sign &
+  [ SYNSEM.LOCAL.CONT.HOOK #hook,
+    C-CONT mrs & [ HOOK #hook ] ].
+
+lex-item := sign &
+  [ SYNSEM lex-synsem,
+    ARG-ST list ].
+
+synsem := avm &
+  [ LOCAL local ].
+
+lex-synsem := synsem &
+  [ LOCAL local,
+    LKEYS lexkeys ].
+
+local := avm &
+  [ CAT cat,
+    CONT mrs ].
+
+cat := avm &
+  [ HEAD head,
+    VAL valence ].
+
+cat-sat := cat &
+ [ VAL.SUBJ list ].
+
+head := avm.
+noun-or-verb := head.
+verb := noun-or-verb.
+noun := noun-or-verb.
+
+valence := avm &
+  [ SUBJ list ].
+
+mrs := avm &
+  [ HOOK hook,
+    RELS diff-list,
+    HCONS diff-list ].
+
+hook := avm &
+  [ GTOP handle,
+    LTOP handle,
+    INDEX individual,
+    XARG individual ].
+
+lexkeys := avm &
+  [ KEYREL relation,
+    ALTKEYREL relation ].
+
+qeq := avm &
+  [ HARG handle,
+    LARG handle ].
+
+semarg := avm &
+  [ INSTLOC string ].
+
+handle := semarg.
+individual := semarg &
+  [ SORT sort ].
+index := individual.
+event-or-ref-index := individual.
+ref-ind := index & event-or-ref-index.
+event := event-or-ref-index.
+
+relation := avm &
+  [ LBL handle,
+    PRED predsort ].
+
+arg0-relation := relation &
+  [ ARG0 individual ].
+
+arg1-relation := arg0-relation &
+  [ ARG1 semarg ].
+
+event-relation := arg0-relation &
+  [ ARG0 event ].
+
+arg1-ev-relation := arg1-relation & event-relation.
+
+noun-relation := arg0-relation &
+  [ ARG0 ref-ind ].
+
+quant-relation := arg0-relation &
+  [ ARG0 ref-ind,
+    RSTR handle,
+    BODY handle ].
+
+sort := *top*.
+predsort := sort.
+atom := predsort.
+string := atom.
+
+cons := list &
+  [ FIRST *top*,
+    REST list ].
+
+0-1-list := list.
+null := 0-1-list.
+
+diff-list := avm &
+  [ LIST list,
+    LAST list ].
+
+; Phrase
+headed-phrase := phrase &
+  [ SYNSEM.LOCAL.CAT.HEAD #head,
+    HEAD-DTR.SYNSEM.LOCAL.CAT.HEAD #head ].
+
+basic-unary-phrase := phrase &
+  [ STEM #stem,
+    SYNSEM [ LOCAL [ CONT [ RELS [ LIST #first,
+				   LAST #last ],
+			    HCONS [ LIST #scfirst,
+				    LAST #sclast ] ] ] ],
+    C-CONT [ RELS [ LIST #middle,
+		    LAST #last ],
+	     HCONS [ LIST #scmiddle,
+		     LAST #sclast ] ],
+    ARGS < [ STEM #stem,
+		    SYNSEM [ LOCAL local &
+			      [ CONT [ RELS [ LIST #first,
+					      LAST #middle ],
+				       HCONS [ LIST #scfirst,
+					       LAST #scmiddle ] ] ] ] ] > ].
+
+head-only := basic-unary-phrase & headed-phrase &
+  [ HEAD-DTR #head,
+    ARGS < #head > ].
+
+basic-bare-np-phrase := head-only &
+  [ SYNSEM.LOCAL.CAT.VAL.SUBJ < >,
+    HEAD-DTR.SYNSEM.LOCAL [ CAT [ HEAD noun,
+                                  VAL.SUBJ < > ],
+                            CONT.HOOK [ INDEX #index,
+                                        LTOP #larg ] ],
+    C-CONT [ RELS <! quant-relation &
+                     [ ARG0 #index,
+                       RSTR #harg ] !>,
+             HCONS <! qeq &
+                      [ HARG #harg,
+                        LARG #larg ] !>,
+             HOOK [ INDEX #index ] ] ].
+
+; Lexical item
+norm-ltop-lex-item := lex-item &
+  [ SYNSEM [ LOCAL.CONT [ HOOK [ LTOP #ltop ],
+                          RELS.LIST.FIRST #keyrel ],
+             LKEYS.KEYREL #keyrel & [ LBL #ltop ] ] ].
+
+norm-hook-lex-item := norm-ltop-lex-item &
+  [ SYNSEM [ LOCAL.CONT.HOOK.INDEX #index,
+             LKEYS.KEYREL.ARG0 #index ] ].
+
+single-rel-lex-item := lex-item &
+ [ SYNSEM.LOCAL.CONT.RELS <! relation !> ].
+ 
+norm-sem-lex-item := norm-hook-lex-item & single-rel-lex-item.
+
+; THESE ARE THE ONLY GRANDPARENT TYPES
+
+no-hcons-lex-item := lex-item &
+  [ SYNSEM.LOCAL.CONT.HCONS <! !> ].
+
+basic-one-arg := lex-item &
+  [ ARG-ST cons ].
+
+; THESE ARE THE ONLY PARENT TYPES
+
+noun-lex := norm-sem-lex-item & basic-one-arg & no-hcons-lex-item &
+  [ SYNSEM [ LOCAL.CAT [ HEAD noun,
+                         VAL.SUBJ < > ],
+             LKEYS.KEYREL noun-relation ] ].
+
+intransitive-verb-lex := norm-sem-lex-item & basic-one-arg & no-hcons-lex-item &
+  [ ARG-ST < [ LOCAL [ CAT cat-sat,
+                       CONT.HOOK.INDEX ref-ind & #ind ] ] >,
+    SYNSEM.LKEYS.KEYREL event-relation & [ ARG1 #ind ] ].
+
+bare-np-phrase := basic-bare-np-phrase &
+  [ C-CONT.RELS <! [ PRED "exist_q_rel" ] !> ].

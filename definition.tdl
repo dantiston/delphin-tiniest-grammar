@@ -1,8 +1,5 @@
 :begin :type.
-:include "head-types".
-:include "matrix".
-:include "minimal-grammar".
-:include "mtr".
+:include "core".
 :end :type.
 
 :begin :instance :status lex-entry.

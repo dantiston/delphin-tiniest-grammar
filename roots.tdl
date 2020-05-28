@@ -1,11 +1,3 @@
-;;; -*- Mode: TDL; Coding: utf-8 -*-
-
 root := sign &
-  [ SYNSEM [ NON-LOCAL non-local-none,
-             LOCAL [ COORD -,
-                     CAT [ VAL [ SUBJ < >,
-                                 COMPS < > ],
-                           MC +,
-                           HEAD verb ] ] ] ].
-
-lex-root := word-or-lexrule.
+  [ SYNSEM.LOCAL.CAT [ VAL.SUBJ < >,
+                       HEAD verb ] ].
