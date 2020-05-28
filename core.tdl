@@ -1,4 +1,3 @@
-
 sign-min := avm &
   [ STEM list ].
 
@@ -7,8 +6,7 @@ basic-sign := sign-min &
 
 sign := basic-sign &
   [ SYNSEM synsem,
-    ARGS list,
-    INFLECTED inflected ].
+    ARGS list ].
 
 phrase-or-lexrule := sign &
   [ SYNSEM canonical-synsem &
@@ -21,23 +19,19 @@ word-or-lexrule := word-or-lexrule-min & sign &
   [ ALTS alts-min,
     ARG-ST list ].
 
-nocoord := sign &
-  [ SYNSEM.LOCAL.COORD - ].
-
 alts-min := avm.
 alts := alts-min &
   [ PASSIVE bool ].
 no-alts := alts-min.
 
-word := word-or-lexrule & nocoord.
+word := word-or-lexrule.
 
-lex-item := word-or-lexrule & nocoord.
+lex-item := word-or-lexrule.
 
 phrase := phrase-or-lexrule.
 
 non-affix-bearing := word-or-lexrule &
-  [ INFLECTED infl-satisfied,
-    SYNSEM.LKEYS.KEYREL.WLINK cons ].
+  [ SYNSEM.LKEYS.KEYREL.WLINK cons ].
 
 rule := sign &
   [ RULE-NAME string ].
@@ -54,9 +48,7 @@ meta := sign &
 
 synsem-min := avm &
   [ OPT bool,
-    OPT-CS cog-st,
-    LOCAL mod-local,
-    NON-LOCAL non-local-min ].
+    LOCAL mod-local ].
 
 lex-or-phrase-synsem := synsem-min &
   [ LIGHT luk ].
@@ -87,16 +79,9 @@ non-canonical := synsem &
 expressed-non-canonical := non-canonical & expressed-synsem.
 
 gap := expressed-non-canonical &
-  [ LOCAL #local,
-    NON-LOCAL [ REL 0-dlist,
-        QUE 0-dlist,
-        SLASH 1-dlist &
-            [ LIST < #local > ] ] ].
+  [ LOCAL #local ].
 
-unexpressed := synsem-min &
-  [ NON-LOCAL [ SLASH 0-dlist,
-        REL 0-dlist,
-        QUE 0-dlist ] ].
+unexpressed := synsem-min.
 
 unexpressed-reg := unexpressed & non-canonical.
 
@@ -108,10 +93,7 @@ mod-local := avm.
 local-min := mod-local &
   [ CAT cat-min,
     CONT mrs-min,
-    AGR individual,
-    COORD bool,
-    COORD-REL coordination-relation,
-    COORD-STRAT string ].
+    AGR individual ].
 
 local := local-min &
   [ CTXT ctxt-min ].
@@ -119,25 +101,12 @@ local := local-min &
 scopal-mod := local.
 intersective-mod := local.
 
-non-local-min := avm.
-
-non-local := non-local-min &
-  [ SLASH 0-1-dlist,
-    QUE 0-1-dlist,
-    REL 0-1-dlist ].
-
-non-local-none := non-local &
-  [ SLASH 0-dlist & [ LIST < > ],
-    QUE 0-dlist,
-    REL 0-dlist ].
-
 cat-min := avm.
 
 cat := cat-min &
   [ HEAD head-min,
     VAL valence-min,
     MC luk,
-    MKG mkg,
     HC-LIGHT luk,
     POSTHEAD bool ].
 
@@ -187,15 +156,13 @@ mrs-min := avm.
 mrs := mrs-min &
   [ HOOK hook,
     RELS diff-list,
-    HCONS diff-list,
-    ICONS diff-list ].
+    HCONS diff-list ].
 
 hook := avm &
   [ GTOP handle,
     LTOP handle,
     INDEX individual,
     XARG individual,
-    ICONS-KEY icons,
     CLAUSE-KEY event ].
 
 psoa := mrs &
@@ -230,27 +197,7 @@ individual := semarg &
   [ SORT semsort ].
 
 index := individual &
-     [ COG-ST cog-st,
-       SPECI bool ].
-
-cog-st := avm.
-
-activ-or-less := cog-st.
-uniq-or-more := cog-st.
-uniq+fam+act := activ-or-less & uniq-or-more.
-fam-or-less := activ-or-less.
-fam-or-more := uniq-or-more.
-activ+fam := uniq+fam+act & fam-or-more.
-uniq+fam := uniq+fam+act & fam-or-less.
-uniq-or-less := fam-or-less.
-activ-or-more := fam-or-more.
-type-id := uniq-or-less.
-uniq-id := uniq-or-less & uniq+fam.
-familiar := uniq+fam & activ+fam.
-activated := activ+fam & activ-or-more.
-in-foc := activ-or-more.
-
-
+     [ SPECI bool ].
 
 event-or-ref-index := individual.
 
@@ -280,11 +227,6 @@ event := event-or-ref-index &
   [ E tam,
     SF iforce ].
 
-coord-index := event-or-ref-index.
-coord-event := coord-index & event.
-coord-ref-ind := coord-index & ref-ind.
-
-
 relation := avm &
   [ LBL handle,
     WLINK list,
@@ -299,19 +241,11 @@ arg1-relation := arg0-relation &
 arg12-relation := arg1-relation &
   [ ARG2 semarg ].
 
-arg123-relation := arg12-relation &
-  [ ARG3 semarg ].
-
-arg1234-relation := arg123-relation &
-  [ ARG4 semarg ].
-
 event-relation := arg0-relation &
   [ ARG0 event ].
 
 arg1-ev-relation := arg1-relation & event-relation.
 arg12-ev-relation := arg1-ev-relation & arg12-relation.
-arg123-ev-relation := arg12-ev-relation & arg123-relation.
-arg1234-ev-relation := arg123-ev-relation & arg1234-relation.
 
 noun-relation := arg0-relation &
   [ ARG0 ref-ind ].
@@ -322,17 +256,6 @@ named-relation := noun-relation &
   [ PRED named_rel,
     CARG string ].
 
-subord-or-coord-relation := relation &
-  [ L-HNDL handle,
-    R-HNDL handle ].
-
-coordination-relation := subord-or-coord-relation &
-  [ C-ARG coord-index,
-    L-INDEX individual,
-    R-INDEX individual ].
-
-subord-relation := subord-or-coord-relation.
-
 quant-relation := arg0-relation &
   [ ARG0 ref-ind,
     RSTR handle,
@@ -340,33 +263,6 @@ quant-relation := arg0-relation &
 
 norm_rel := predsort.
 named_rel := norm_rel.
-
-
-
-icons := avm.
-
-info-str := icons &
-  [ IARG1 individual,
-    IARG2 individual ].
-
-non-topic := info-str.
-contrast-or-focus := info-str.
-focus-or-topic := info-str.
-contrast-or-topic := info-str.
-non-focus := info-str.
-
-focus := non-topic & contrast-or-focus & focus-or-topic.
-contrast := focus-or-topic & contrast-or-focus & contrast-or-topic.
-topic := non-focus & focus-or-topic & contrast-or-topic.
-
-bg := non-topic & non-focus.
-
-semantic-focus := focus.
-contrast-focus := contrast & focus.
-contrast-topic := contrast & topic.
-aboutness-topic := topic.
-
-
 
 luk := sort.
 
@@ -442,410 +338,74 @@ ocons := olist & cons &
 
 onull := olist & null.
 
-lex-rule := phrase-or-lexrule & word-or-lexrule &
-  [ NEEDS-AFFIX bool,
-    SYNSEM.LOCAL.CONT [ RELS [ LIST #first,
-                   LAST #last ],
-            HCONS [ LIST #hfirst,
-                LAST #hlast ],
-            ICONS [ LIST #ifirst,
-                LAST #ilast ] ],
-    DTR #dtr & word-or-lexrule &
-        [ SYNSEM.LOCAL.CONT [ RELS [ LIST #first,
-                         LAST #middle ],
-                      HCONS [ LIST #hfirst,
-                          LAST #hmiddle ],
-                      ICONS [ LIST #ifirst,
-                          LAST #imiddle ] ],
-          ALTS #alts ],
-    C-CONT [ RELS [ LIST #middle,
-            LAST #last ],
-         HCONS [ LIST #hmiddle,
-             LAST #hlast ],
-         ICONS [ LIST #imiddle,
-             LAST #ilast ] ],
-    ALTS #alts,
-    ARGS < #dtr > ].
-
-inflected := avm.
-infl-satisfied := inflected.
-
-same-local-lex-rule := same-cat-lex-rule &
-               same-cont-lex-rule &
-               same-ctxt-lex-rule &
-               same-agr-lex-rule.
-
-same-non-local-lex-rule := lex-rule &
-  [ SYNSEM.NON-LOCAL #nl,
-    DTR.SYNSEM.NON-LOCAL #nl ].
-
-same-modified-lex-rule := lex-rule &
-  [ SYNSEM.MODIFIED #mod,
-    DTR.SYNSEM.MODIFIED #mod ].
-
-same-light-lex-rule := lex-rule &
-  [ SYNSEM.LIGHT #light,
-    DTR.SYNSEM.LIGHT #light ].
-
-same-ctxt-lex-rule := lex-rule &
-  [ SYNSEM.LOCAL.CTXT #ctxt,
-    DTR.SYNSEM.LOCAL.CTXT #ctxt ].
-
-same-cont-lex-rule := lex-rule &
-  [ C-CONT [ HOOK #hook ],
-    DTR.SYNSEM.LOCAL.CONT [ HOOK #hook ]].
-
-same-agr-lex-rule := lex-rule &
-  [ SYNSEM.LOCAL.AGR #agr,
-    DTR.SYNSEM.LOCAL.AGR #agr ].
-
-same-cat-lex-rule := lex-rule &
-  [ SYNSEM.LOCAL.CAT #cat,
-    DTR.SYNSEM.LOCAL.CAT #cat ].
-
-same-head-lex-rule := lex-rule &
-  [ SYNSEM.LOCAL.CAT.HEAD #head,
-    DTR.SYNSEM.LOCAL.CAT.HEAD #head ].
-
-same-val-lex-rule := lex-rule &
-  [ SYNSEM.LOCAL.CAT.VAL #val,
-    DTR.SYNSEM.LOCAL.CAT.VAL #val ].
-
-same-subj-lex-rule := lex-rule &
-  [ SYNSEM.LOCAL.CAT.VAL.SUBJ #subj,
-    DTR.SYNSEM.LOCAL.CAT.VAL.SUBJ #subj ].
-
-same-spr-lex-rule := lex-rule &
-  [ SYNSEM.LOCAL.CAT.VAL.SPR #spr,
-    DTR.SYNSEM.LOCAL.CAT.VAL.SPR #spr ].
-
-same-spec-lex-rule := lex-rule &
-  [ SYNSEM.LOCAL.CAT.VAL.SPEC #spec,
-    DTR.SYNSEM.LOCAL.CAT.VAL.SPEC #spec ].
-
-same-comps-lex-rule := lex-rule &
-  [ SYNSEM.LOCAL.CAT.VAL.COMPS #comps,
-    DTR.SYNSEM.LOCAL.CAT.VAL.COMPS #comps ].
-
-same-hc-light-lex-rule := lex-rule &
-  [ SYNSEM.LOCAL.CAT.HC-LIGHT #hcl,
-    DTR.SYNSEM.LOCAL.CAT.HC-LIGHT #hcl ].
-
-same-posthead-lex-rule := lex-rule &
-  [ SYNSEM.LOCAL.CAT.POSTHEAD #ph,
-    DTR.SYNSEM.LOCAL.CAT.POSTHEAD #ph ].
-
-same-mc-lex-rule := lex-rule &
-  [ SYNSEM.LOCAL.CAT.MC #mc,
-    DTR.SYNSEM.LOCAL.CAT.MC #mc ].
-
-no-rels-hcons-lex-rule := lex-rule &
-  [ C-CONT [ RELS <! !>, HCONS <! !>  ] ].
-
-no-ccont-lex-rule := no-rels-hcons-lex-rule &
-  [ C-CONT.ICONS <! !> ].
-
-non-local-change-only-lex-rule := same-local-lex-rule &
-                  same-modified-lex-rule &
-                  same-light-lex-rule &
-                  no-ccont-lex-rule.
-
-local-change-only-lex-rule := same-non-local-lex-rule &
-                  same-modified-lex-rule &
-                  same-light-lex-rule &
-                  no-ccont-lex-rule.
-
-cont-change-only-lex-rule := same-non-local-lex-rule &
-                 same-modified-lex-rule &
-                 same-light-lex-rule &
-                 same-ctxt-lex-rule &
-                 same-cat-lex-rule &
-                 same-agr-lex-rule.
-
-ctxt-change-only-lex-rule := local-change-only-lex-rule &
-                 same-cont-lex-rule &
-                 same-cat-lex-rule &
-                 same-agr-lex-rule.
-
-agr-change-only-lex-rule := local-change-only-lex-rule &
-                same-cont-lex-rule &
-                same-cat-lex-rule &
-                same-ctxt-lex-rule.
-
-cat-change-only-lex-rule := local-change-only-lex-rule &
-                same-ctxt-lex-rule &
-                same-cont-lex-rule &
-                same-agr-lex-rule.
-
-head-change-only-lex-rule := cat-change-only-lex-rule &
-                 same-val-lex-rule &
-                 same-hc-light-lex-rule &
-                 same-posthead-lex-rule &
-                 same-mc-lex-rule.
-
-mc-change-only-lex-rule := cat-change-only-lex-rule &
-               same-val-lex-rule &
-               same-hc-light-lex-rule &
-               same-posthead-lex-rule &
-               same-head-lex-rule.
-
-val-change-only-lex-rule := cat-change-only-lex-rule &
-                same-head-lex-rule &
-                same-hc-light-lex-rule &
-                same-posthead-lex-rule &
-                same-mc-lex-rule.
-
-same-gtop-lex-rule := lex-rule &
- [ C-CONT.HOOK.GTOP #gtop,
-   DTR.SYNSEM.LOCAL.CONT.HOOK.GTOP #gtop ].
-
-same-ltop-lex-rule := lex-rule &
- [ C-CONT.HOOK.LTOP #ltop,
-   DTR.SYNSEM.LOCAL.CONT.HOOK.LTOP #ltop ].
-
-same-index-lex-rule := lex-rule &
- [ C-CONT.HOOK.INDEX #idx,
-   DTR.SYNSEM.LOCAL.CONT.HOOK.INDEX #idx ].
-
-same-icons-key-lex-rule := lex-rule &
- [ C-CONT.HOOK.ICONS-KEY #icons,
-   DTR.SYNSEM.LOCAL.CONT.HOOK.ICONS-KEY #icons ].
-
-same-clause-key-lex-rule := lex-rule &
- [ C-CONT.HOOK.CLAUSE-KEY #clause,
-   DTR.SYNSEM.LOCAL.CONT.HOOK.CLAUSE-KEY #clause ].
-
-
-
-xarg-change-only-ccont-lex-rule :=  same-gtop-lex-rule &
-                                    same-ltop-lex-rule &
-                                    same-index-lex-rule &
-                                    same-icons-key-lex-rule &
-                                    same-clause-key-lex-rule.
-
-cat-change-with-ccont-lex-rule := same-modified-lex-rule &
-                                  same-light-lex-rule &
-                                  same-ctxt-lex-rule &
-                                  same-agr-lex-rule.
-
-val-change-with-ccont-lex-rule := cat-change-with-ccont-lex-rule &
-                                  same-head-lex-rule &
-                                  same-hc-light-lex-rule &
-                                  same-posthead-lex-rule &
-                                  same-mc-lex-rule.
-
-comps-change-only-lex-rule := same-subj-lex-rule &
-                              same-spr-lex-rule &
-                              same-spec-lex-rule.
-
-subj-change-only-lex-rule := same-comps-lex-rule &
-                             same-spr-lex-rule &
-                             same-spec-lex-rule.
-
-subj-and-comps-change-only-lex-rule := same-spr-lex-rule &
-                                       same-spec-lex-rule.
-
-local-change-with-ccont-lex-rule := same-non-local-lex-rule &
-                                    same-modified-lex-rule &
-                                    same-light-lex-rule.
-
-cat-mod-change-with-ccont-lex-rule := local-change-with-ccont-lex-rule &
-                                      same-ctxt-lex-rule &
-                                      same-cont-lex-rule &
-                                      same-agr-lex-rule.
-
-head-change-with-ccont-lex-rule := cat-mod-change-with-ccont-lex-rule &
-                                   same-val-lex-rule &
-                                   same-hc-light-lex-rule &
-                                   same-posthead-lex-rule &
-                                   same-mc-lex-rule.
-
-add-only-rule := same-local-lex-rule &
-                 same-modified-lex-rule &
-                 same-light-lex-rule &
-                 same-non-local-lex-rule.
-
-add-only-no-ccont-rule := add-only-rule &
-                          no-ccont-lex-rule.
-
-add-only-no-rels-hcons-rule := add-only-rule &
-                               no-rels-hcons-lex-rule.
-
-inflecting-lex-rule := lex-rule &
-  [ NEEDS-AFFIX + ].
-
-constant-lex-rule := lex-rule &
-  [ STEM #stem,
-    DTR [ STEM #stem ]].
-
-infl-lex-rule := inflecting-lex-rule & nocoord.
-const-lex-rule := constant-lex-rule & nocoord.
-
-infl-non-local-change-only-lex-rule := non-local-change-only-lex-rule &
-                                       infl-lex-rule.
-
-infl-local-change-only-lex-rule := local-change-only-lex-rule &
-                                   infl-lex-rule.
-
-infl-cont-change-only-lex-rule := cont-change-only-lex-rule &
-                                  infl-lex-rule.
-
-infl-ctxt-change-only-lex-rule := ctxt-change-only-lex-rule &
-                                  infl-lex-rule.
-
-infl-agr-change-only-lex-rule := agr-change-only-lex-rule &
-                                 infl-lex-rule.
-
-infl-cat-change-only-lex-rule := cat-change-only-lex-rule &
-                                 infl-lex-rule.
-
-infl-head-change-only-lex-rule := head-change-only-lex-rule &
-                                  infl-lex-rule.
-
-infl-val-change-only-lex-rule := val-change-only-lex-rule &
-                                 infl-lex-rule.
-
-infl-add-only-lex-rule := add-only-rule & infl-lex-rule.
-
-infl-add-only-no-rels-hcons-lex-rule := add-only-rule & infl-lex-rule &
-  [ C-CONT [ RELS <! !>, HCONS <! !> ] ].
-
-infl-add-only-no-ccont-lex-rule := add-only-no-ccont-rule &
-                                   infl-lex-rule.
-
-const-non-local-change-only-lex-rule := non-local-change-only-lex-rule &
-                                        const-lex-rule.
-
-const-local-change-only-lex-rule := local-change-only-lex-rule &
-                                    const-lex-rule.
-
-const-cont-change-only-lex-rule := cont-change-only-lex-rule &
-                                   const-lex-rule.
-
-const-ctxt-change-only-lex-rule := ctxt-change-only-lex-rule &
-                                   const-lex-rule.
-
-const-agr-change-only-lex-rule := agr-change-only-lex-rule &
-                                  const-lex-rule.
-
-const-cat-change-only-lex-rule := cat-change-only-lex-rule &
-                                  const-lex-rule.
-
-const-head-change-only-lex-rule := head-change-only-lex-rule &
-                                   const-lex-rule.
-
-const-val-change-only-lex-rule := val-change-only-lex-rule &
-                                  const-lex-rule.
-
-const-add-only-lex-rule := add-only-rule & const-lex-rule.
-
-const-add-only-no-rels-hcons-lex-rule := add-only-rule & const-lex-rule &
-  [ C-CONT [ RELS <! !>, HCONS <! !> ] ].
-
-const-add-only-no-ccont-lex-rule := add-only-no-ccont-rule & const-lex-rule.
-
 
 headed-phrase := phrase &
   [ SYNSEM.LOCAL [ CAT.HEAD head & #head,
-                   AGR #agr,
-                   COORD -,
-                   COORD-REL #crel ],
-    C-CONT.HOOK.ICONS-KEY #icons,
+                   AGR #agr ],
     HEAD-DTR.SYNSEM.LOCAL local &
          [ CAT.HEAD #head,
-           CONT.HOOK.ICONS-KEY #icons,
-           AGR #agr,
-           COORD -,
-           COORD-REL #crel ] ].
+           AGR #agr ] ].
 
 non-headed-phrase := phrase.
 
 phrasal := phrase &
   [ SYNSEM phr-synsem ].
 
-head-nexus-rel-phrase := headed-phrase &
-  [ SYNSEM.NON-LOCAL.REL #rel,
-    HEAD-DTR.SYNSEM.NON-LOCAL.REL #rel ].
+head-nexus-rel-phrase := headed-phrase.
 
-head-nexus-que-phrase := headed-phrase &
-  [ SYNSEM.NON-LOCAL.QUE #que,
-    HEAD-DTR.SYNSEM.NON-LOCAL.QUE #que ].
+head-nexus-que-phrase := headed-phrase.
 
 head-nexus-phrase := head-nexus-rel-phrase & head-nexus-que-phrase.
 
-
-head-valence-phrase := head-nexus-phrase &
-  [ SYNSEM.NON-LOCAL.SLASH #slash,
-    HEAD-DTR.SYNSEM.NON-LOCAL.SLASH #slash ].
+head-valence-phrase := head-nexus-phrase.
 
 basic-unary-phrase := phrase &
   [ STEM #stem,
     SYNSEM [ L-PERIPH #lperiph,
          R-PERIPH #rperiph,
-         LOCAL [ CAT.MKG #mkg,
-             CONT [ RELS [ LIST #first,
+         LOCAL [ CONT [ RELS [ LIST #first,
                    LAST #last ],
                 HCONS [ LIST #scfirst,
-                    LAST #sclast ],
-                ICONS [ LIST #icfirst,
-                    LAST #iclast ] ] ] ],
+                    LAST #sclast ] ] ] ],
     C-CONT [ RELS [ LIST #middle,
             LAST #last ],
          HCONS [ LIST #scmiddle,
-             LAST #sclast ],
-         ICONS [ LIST #icmiddle,
-             LAST #iclast ] ],
+             LAST #sclast ] ],
     ARGS < sign & [ STEM #stem,
             SYNSEM [ L-PERIPH #lperiph,
                  R-PERIPH #rperiph,
                  LOCAL local &
-                  [ CAT.MKG #mkg,
-                CONT [ RELS [ LIST #first,
+                  [ CONT [ RELS [ LIST #first,
                           LAST #middle ],
                        HCONS [ LIST #scfirst,
-                           LAST #scmiddle ],
-                       ICONS [ LIST #icfirst,
-                           LAST #icmiddle ] ] ] ] ] > ].
+                           LAST #scmiddle ] ] ] ] ] > ].
 
-unary-phrase := basic-unary-phrase &
-  [ INFLECTED infl-satisfied,
-    ARGS < [ INFLECTED infl-satisfied ] > ].
+unary-phrase := basic-unary-phrase.
 
 basic-binary-phrase := phrase &
   [ SYNSEM.LOCAL.CONT [ RELS [ LIST #first,
                                LAST #last ],
             HCONS [ LIST #scfirst,
-                    LAST #sclast ],
-            ICONS [ LIST #icfirst,
-                    LAST #iclast ] ],
+                    LAST #sclast ] ],
     C-CONT [ RELS [ LIST #middle2,
                     LAST #last ],
          HCONS [ LIST #scmiddle2,
-                 LAST #sclast ],
-         ICONS [ LIST #icmiddle2,
-                 LAST #iclast ] ],
+                 LAST #sclast ] ],
     ARGS < sign & [ SYNSEM.LOCAL local &
                  [ CONT [ RELS [ LIST #first,
                                  LAST #middle1 ],
                       HCONS [ LIST #scfirst,
-                              LAST #scmiddle1 ],
-                      ICONS [ LIST #icfirst,
-                              LAST #icmiddle1 ] ] ] ],
+                              LAST #scmiddle1 ] ] ] ],
        sign & [ SYNSEM.LOCAL local &
                  [ CONT [ RELS [ LIST #middle1,
                                  LAST #middle2 ],
                       HCONS [ LIST #scmiddle1,
-                              LAST #scmiddle2 ],
-                      ICONS [ LIST #icmiddle1,
-                              LAST #icmiddle2 ] ] ] ] > ].
+                              LAST #scmiddle2 ] ] ] ] > ].
 
-binary-phrase := basic-binary-phrase &
-  [ INFLECTED infl-satisfied,
-    ARGS < [ INFLECTED infl-satisfied ],
-           [ INFLECTED infl-satisfied ] > ].
+binary-phrase := basic-binary-phrase.
 
 basic-binary-headed-phrase := headed-phrase & basic-binary-phrase &
-  [ NON-HEAD-DTR sign & [ SYNSEM.LOCAL.COORD - ] ].
+  [ NON-HEAD-DTR sign ].
 
 binary-headed-phrase := basic-binary-headed-phrase & binary-phrase.
 
@@ -853,47 +413,29 @@ basic-ternary-phrase := phrase &
   [ SYNSEM.LOCAL.CONT [ RELS [ LIST #first,
                                LAST #last ],
             HCONS [ LIST #scfirst,
-                    LAST #sclast ],
-            ICONS [ LIST #icfirst,
-                    LAST #iclast ] ],
+                    LAST #sclast ] ],
     C-CONT [ RELS [ LIST #middle3,
                     LAST #last ],
          HCONS [ LIST #scmiddle3,
-                 LAST #sclast ],
-         ICONS [ LIST #icmiddle3,
-                 LAST #iclast ] ],
+                 LAST #sclast ] ],
     ARGS <
         sign & [ SYNSEM.LOCAL local &
                  [ CONT [ RELS [ LIST #first,
                                  LAST #middle1 ],
                       HCONS [ LIST #scfirst,
-                              LAST #scmiddle1 ],
-                      ICONS [ LIST #icfirst,
-                              LAST #icmiddle1 ] ] ] ],
+                              LAST #scmiddle1 ] ] ] ],
         sign & [ SYNSEM.LOCAL local &
                  [ CONT [ RELS [ LIST #middle1,
                                  LAST #middle2 ],
                       HCONS [ LIST #scmiddle1,
-                              LAST #scmiddle2 ],
-                      ICONS [ LIST #icmiddle1,
-                              LAST #icmiddle2 ] ] ] ],
+                              LAST #scmiddle2 ] ] ] ],
         sign & [ SYNSEM.LOCAL local &
                  [ CONT [ RELS [ LIST #middle2,
                                  LAST #middle3 ],
                       HCONS [ LIST #scmiddle2,
-                              LAST #scmiddle3 ],
-                      ICONS [ LIST #icmiddle2,
-                              LAST #icmiddle3 ] ] ] ]> ].
+                              LAST #scmiddle3 ] ] ] ]> ].
 
-ternary-phrase := basic-ternary-phrase &
-  [ INFLECTED infl-satisfied,
-    ARGS < [ INFLECTED infl-satisfied,
-             SYNSEM.LOCAL.COORD - ],
-           [ INFLECTED infl-satisfied,
-             SYNSEM.LOCAL.COORD - ],
-           [ INFLECTED infl-satisfied,
-             SYNSEM.LOCAL.COORD - ] > ].
-
+ternary-phrase := basic-ternary-phrase.
 
 ternary-headed-phrase := headed-phrase & ternary-phrase.
 
@@ -930,20 +472,13 @@ head-compositional := headed-phrase &
   [ C-CONT.HOOK #hook,
     HEAD-DTR.SYNSEM.LOCAL.CONT.HOOK #hook ].
 
-
-clause := phrasal &
-  [ SYNSEM.NON-LOCAL.QUE 0-dlist ].
-
+clause := phrasal.
 
 basic-non-rel-clause := clause & head-compositional &
-  [ SYNSEM.NON-LOCAL.REL 0-dlist,
-    HEAD-DTR.SYNSEM [ LOCAL.CONT.HOOK [ INDEX #index,
-                    ICONS-KEY.IARG1 #index,
-                    CLAUSE-KEY #index ],
-              NON-LOCAL [ QUE 0-dlist,
-                  REL 0-dlist ] ],
+  [ HEAD-DTR.SYNSEM [ LOCAL.CONT.HOOK [ INDEX #index,
+                                        CLAUSE-KEY #index ] ],
     C-CONT [ RELS <! !>,
-         HCONS <! !> ] ].
+             HCONS <! !> ] ].
 
 declarative-clause := basic-non-rel-clause &
   [ SYNSEM.LOCAL.CONT.HOOK.INDEX.SF prop-or-ques ].
@@ -965,11 +500,8 @@ basic-head-subj-phrase := head-valence-phrase & head-compositional &
     NON-HEAD-DTR.SYNSEM #synsem & canonical-synsem &
            [ LOCAL [ CAT [ VAL [ SUBJ olist,
                                  COMPS olist,
-                                 SPR olist ] ] ],
-             NON-LOCAL [ SLASH 0-dlist & [ LIST < > ],
-                         REL 0-dlist,
-                         QUE 0-dlist ] ],
-    C-CONT [ RELS <! !>, HCONS <! !>, ICONS <! !> ] ].
+                                 SPR olist ] ] ] ],
+    C-CONT [ RELS <! !>, HCONS <! !> ] ].
 
 decl-head-subj-phrase := basic-head-subj-phrase & declarative-clause.
 
@@ -991,7 +523,6 @@ basic-bare-np-phrase := head-only & head-valence-phrase &
              HCONS <! qeq &
                       [ HARG #harg,
                         LARG #larg ] !>,
-             ICONS <! !>,
              HOOK [ INDEX #index ] ] ].
 
 
@@ -1020,53 +551,21 @@ single-rel-lex-item := lex-item &
 no-hcons-lex-item := lex-item &
   [ SYNSEM.LOCAL.CONT.HCONS <! !> ].
 
-no-rels-hcons-icons-lex-item := no-hcons-lex-item &
-  [ SYNSEM.LOCAL.CONT [ RELS <! !>, ICONS <! !> ] ].
-
-basic-icons-lex-item := lex-item & [ SYNSEM.LOCAL.CONT.ICONS <! !> ].
-
 norm-sem-lex-item := norm-hook-lex-item & single-rel-lex-item.
 
-hcons-lex-item := norm-hook-lex-item & single-rel-lex-item.
-
 basic-one-arg := lex-item &
-  [ ARG-ST < [ NON-LOCAL [ SLASH #slash,
-                           REL #rel,
-                           QUE #que ] ] >,
-    SYNSEM.NON-LOCAL [ SLASH #slash,
-                       REL #rel,
-                       QUE #que ] ].
-
+  [ ARG-ST < synsem-min > ].
 
 basic-two-arg := lex-item &
-  [ ARG-ST < [ NON-LOCAL [ SLASH [ LIST #smiddle,
-                                   LAST #slast ],
-                           REL [ LIST #rmiddle,
-                                 LAST #rlast ],
-                           QUE [ LIST #qmiddle,
-                                 LAST #qlast ] ] ],
-              [ NON-LOCAL [ SLASH [ LIST #sfirst,
-                                    LAST #smiddle ],
-                            REL [ LIST #rfirst,
-                                  LAST #rmiddle ],
-                            QUE [ LIST #qfirst,
-                                  LAST #qmiddle ] ] ] >,
-    SYNSEM.NON-LOCAL [ SLASH [ LIST #sfirst,
-                               LAST #slast ],
-                       REL [ LIST #rfirst,
-                             LAST #rlast ],
-                       QUE [ LIST #qfirst,
-                             LAST #qlast ] ] ].
+  [ ARG-ST < synsem-min, synsem-min > ].
 
 basic-two-arg-no-hcons := basic-two-arg & no-hcons-lex-item.
 
-transitive-lex-item := basic-two-arg-no-hcons & basic-icons-lex-item &
+transitive-lex-item := basic-two-arg-no-hcons &
    [ ARG-ST < [ LOCAL [ CAT cat-sat,
-                        CONT.HOOK [ INDEX ref-ind & #ind1,
-                                    ICONS-KEY.IARG1 #clause ] ] ],
+                        CONT.HOOK [ INDEX ref-ind & #ind1] ] ],
               [ LOCAL [ CAT cat-sat,
-                        CONT.HOOK [ INDEX ref-ind & #ind2,
-                                    ICONS-KEY.IARG1 #clause ] ] ]>,
+                        CONT.HOOK [ INDEX ref-ind & #ind2 ] ] ]>,
      SYNSEM [ LKEYS.KEYREL [ ARG1 #ind1,
                              ARG2 #ind2 ],
               LOCAL.CONT.HOOK.CLAUSE-KEY #clause ] ].
@@ -1077,20 +576,9 @@ basic-verb-lex-super := lex-item &
 basic-verb-lex := basic-verb-lex-super & norm-sem-lex-item &
   [ SYNSEM.LKEYS.KEYREL event-relation ].
 
-basic-noun-lex := norm-sem-lex-item & basic-icons-lex-item &
+basic-noun-lex := norm-sem-lex-item &
   [ SYNSEM [ LOCAL.CAT.HEAD noun,
              LKEYS.KEYREL noun-relation ]].
-
-mkg := avm & [ FC luk, TP luk ].
-fc := mkg & [ FC + ].
-non-tp := mkg & [ TP - ].
-tp := mkg & [ TP + ].
-non-fc := mkg & [ FC - ].
-fc-only := fc & non-tp.
-fc-+-tp := tp & fc.
-unmkg := non-tp & non-fc.
-tp-only := tp & non-fc.
-
 
 noun-lex := norm-sem-lex-item & basic-one-arg & no-hcons-lex-item &
   [ SYNSEM [ LOCAL.CAT [ HEAD noun,
