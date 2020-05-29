@@ -1,6 +1,5 @@
 :begin :type.
-:include "head-types".
-:include "core".
+:include "tiniest".
 :end :type.
 
 :begin :instance :status lex-entry.
