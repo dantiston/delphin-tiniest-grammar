@@ -20,9 +20,5 @@ cons-type                 := cons.
 null-type                 := null.
 diff-list-type            := diff-list.
 
-parsing-packing-restrictor := STEM RELS HCONS RNAME.
-
-generation-packing-restrictor := STEM RELS HCONS RNAME.
-
 mrs-deleted-roles := 
   IDIOMP LNK CFROM CTO --PSV WLINK PARAMS.
